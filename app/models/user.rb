@@ -10,6 +10,8 @@ class User < ApplicationRecord
 
     store_accessor :preferences, :theme, :timezone, :compact_view, prefix: :pref
 
+    validates :role, presence: { strict: ArgumentError }
+
     validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP },
         uniqueness: { case_sensitive: false }
     validates :username, presence: true, length: { in: 3..60 },

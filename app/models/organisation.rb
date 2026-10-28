@@ -36,6 +36,13 @@ class Organisation < ApplicationRecord
 
     validate :require_corporate_billing_email, on: :billing_checkout
 
+    def validation_error_payload
+        errors.group_by_attribute.transform_values.with_index do |msgs, idx|
+            attr = errors.messages.keys[idx]
+            { messages: msgs.map(&:message), codes: errors.details[attr].map { |d| d[:error] } }
+        end
+    end
+
     def plan_upgrade_summary
         return nil unless saved_change_to_plan?
         from_plan, to_plan = saved_change_to_plan
