@@ -3,6 +3,9 @@ class Organisation < ApplicationRecord
     after_initialize :apply_default_settings, if: :new_record?
     before_create :set_default_pro_trial, if: :plan_pro?
     before_destroy :prevent_verified_enterprise_destruction
+    around_save :measure_save_duration
+
+    attr_reader :last_save_duration_ms
 
     validates_with OrganisationPlanValidator
 
@@ -84,5 +87,11 @@ class Organisation < ApplicationRecord
             errors.add(:base, "cannot destroy a verified enterprise, archive it first")
             throw(:abort)
         end
+    end
+
+    def measure_save_duration
+        t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        yield
+        @last_save_duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - t0) * 1000.0).round(2)
     end
 end

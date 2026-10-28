@@ -3,12 +3,12 @@ class User < ApplicationRecord
     THEMES = %w[light dark system].freeze
 
     before_update :reset_failed_attempt_on_update, if: -> {
-        will_save_change_to_locked_at? & locked_at.nil?
+        will_save_change_to_locked_at? && locked_at.nil?
     }
 
     after_find { @hydrated_at = Process.clock_gettime(Process::CLOCK_MONOTONIC) }
     attr_reader :hydrated_at
-    
+
     normalizes :email, with: ->(email) { email.strip.downcase }
     normalizes :username, with: ->(u) { u.strip }
 
