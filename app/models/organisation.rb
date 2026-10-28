@@ -1,10 +1,8 @@
 class Organisation < ApplicationRecord
-    include ActiveRecord::Suppress
-
     before_validation :derive_slug_from_name, on: :create
     after_initialize :apply_default_settings, if: :new_record?
     before_create :set_default_pro_trial, if: :plan_pro?
-    before_destroy :prevent_verified_enterprise_destruction
+    before_destroy :prevent_verified_enterprise_destruction, prepend: true
     around_save :measure_save_duration
     after_save AuditLoggerCallback.new
     after_commit :publish_outbox_event, on: [:create, :update]
