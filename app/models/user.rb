@@ -13,7 +13,7 @@ class User < ApplicationRecord
     validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP },
         uniqueness: { case_sensitive: false }
     validates :username, presence: true, length: { in: 3..60 },
-        exclusion: { in: RESERVED_NAMES, message: "%{value} is reserved"},
+        exclusion: { in: RESERVED_NAMES, message: "%{value} is reserved" },
         format: { with: /\A[a-zA-Z0-9_.-]+\z/ },
         uniqueness: { case_sensitive: false }
     validates :failed_attempts, comparison: { greater_than_or_equal_to: 0 }

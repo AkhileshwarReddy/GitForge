@@ -1,4 +1,6 @@
 class Organisation < ApplicationRecord
+    validates_with OrganisationPlanValidator
+
     RESERVED_NAMES = %w[admin api root help explore settings login help oauth graphql].freeze
     FREE_EMAIL_DOMAINS = %w[gmail.com yahoo.com hotmail.com outlook.com].freeze
 
@@ -26,7 +28,7 @@ class Organisation < ApplicationRecord
 
     with_options if: :plan_enterprise? do
         validates :billing_email, presence: true
-        validates :verified, inclusion: { in: [true], message: "must be verified for Enterprise plan" }
+        validates :verified, inclusion: { in: [ true ], message: "must be verified for Enterprise plan" }
         validates :ip_allowlist, presence: { message: "must specify at least one CIDR block for Enterprise" }
     end
 
