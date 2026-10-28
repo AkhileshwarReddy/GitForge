@@ -6,7 +6,7 @@ class Organisation < ApplicationRecord
     enum :plan, { free: 0, pro: 1, enterprise: 2 },
         prefix: :plan, validate: true
 
-    store_accessor :settings, :default_branch, :require_2fa
+    store_accessor :settings, :default_branch, :require_2fa, :ip_allowlist
 
     validates :name, presence: true, length: { minimum: 2, maximum: 120 }
     validates :slug, presence: true, length: { in: 2..80 },
@@ -22,6 +22,12 @@ class Organisation < ApplicationRecord
             less_than_or_equal_to: 100.terabytes
         }
     validates :trial_ends_at, comparison: { greater_than: -> { Time.current } }, allow_nil: true
+
+    with_options if: :plan_enterprise? do
+        validates :billing_email, presence: true
+        validates :verified, inclusion: { in: [true], message: "must be verified for Enterprise plan" }
+        validates :ip_allowlist, presence: { message: "must specify at least one CIDR block for Enterprise" }
+    end
 
     def plan_upgrade_summary
         return nil unless saved_change_to_plan?
