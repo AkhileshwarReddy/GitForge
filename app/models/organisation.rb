@@ -92,6 +92,17 @@ class Organisation < ApplicationRecord
         end
     end
 
+    def build_project_with_config(name:, creator: )
+        proj = projects.build(
+            name: name,
+            creator: creator,
+            path: name
+        )
+
+        proj.build_repository_config
+        proj
+    end
+
     private
 
     def require_corporate_billing_email
