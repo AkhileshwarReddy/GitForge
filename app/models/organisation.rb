@@ -1,5 +1,6 @@
 class Organisation < ApplicationRecord
     RESERVED_NAMES = %w[admin api root help explore settings login help oauth graphql].freeze
+    FREE_EMAIL_DOMAINS = %w[gmail.com yahoo.com hotmail.com outlook.com].freeze
 
     attribute :slug, :normalized_slig
 
@@ -29,6 +30,8 @@ class Organisation < ApplicationRecord
         validates :ip_allowlist, presence: { message: "must specify at least one CIDR block for Enterprise" }
     end
 
+    validate :require_corporate_billing_email, on: :billing_checkout
+
     def plan_upgrade_summary
         return nil unless saved_change_to_plan?
         from_plan, to_plan = saved_change_to_plan
@@ -37,5 +40,14 @@ class Organisation < ApplicationRecord
 
     def revert_unsaved_slug!
         restore_attribute!(:slug) if will_save_change_to_slug?
+    end
+
+    private
+
+    def require_corporate_billing_email
+        domain = billing_email.to_s.split("@").last&.downcase
+        if domain.blank? || FREE_EMAIL_DOMAINS.include?(domain)
+            errors.add(:billing_email, :corporate_domain_required, message: "must be a corporate domain for checkout")
+        end
     end
 end
