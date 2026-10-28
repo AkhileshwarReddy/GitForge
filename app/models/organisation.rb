@@ -6,6 +6,11 @@ class Organisation < ApplicationRecord
 
     store_accessor :settings, :default_branch, :require_2fa
 
+    validates :name, presence: true, length: { minimum: 2, maximum: 120 }
+    validates :slug, presence: true, length: { in: 2..80 },
+        format: { with: /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/ },
+        message: "must be lowercase alphanumeric with hyphens"
+
     def plan_upgrade_summary
         return nil unless saved_change_to_plan?
         from_plan, to_plan = saved_change_to_plan
