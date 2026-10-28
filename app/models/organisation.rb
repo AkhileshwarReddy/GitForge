@@ -1,4 +1,6 @@
 class Organisation < ApplicationRecord
+    include ActiveRecord::Suppress
+
     before_validation :derive_slug_from_name, on: :create
     after_initialize :apply_default_settings, if: :new_record?
     before_create :set_default_pro_trial, if: :plan_pro?
@@ -65,6 +67,12 @@ class Organisation < ApplicationRecord
 
     def revert_unsaved_slug!
         restore_attribute!(:slug) if will_save_change_to_slug?
+    end
+
+    def silent_verify!
+        AuditLog.suppress do
+            update!(verified: true)
+        end
     end
 
     private
