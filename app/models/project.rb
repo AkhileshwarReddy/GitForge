@@ -4,6 +4,8 @@ class Project < ApplicationRecord
   belongs_to :organisation, inverse_of: :projects, touch: true
   belongs_to :creator, class_name: 'User',
     foreign_key: :creator_id, inverse_of: :created_projects
+  
+  has_one :repository_config, dependent: :destroy, inverse_of: :project
 
   enum :visibility, {
     private_vis: 0,

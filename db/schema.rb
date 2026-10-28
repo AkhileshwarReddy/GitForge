@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_28_174729) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_28_180026) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -65,6 +65,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_28_174729) do
     t.index ["organisation_id"], name: "index_projects_on_organisation_id"
   end
 
+  create_table "repository_configs", force: :cascade do |t|
+    t.bigint "project_id", null: false
+    t.string "default_branch", default: "main", null: false
+    t.string "merge_method", default: "merge_commit", null: false
+    t.boolean "lfs_enabled", default: true, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_repository_configs_on_project_id", unique: true
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email", null: false
     t.string "username", limit: 60, null: false
@@ -84,4 +94,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_28_174729) do
   add_foreign_key "memberships", "users", on_delete: :cascade
   add_foreign_key "projects", "organisations", on_delete: :cascade
   add_foreign_key "projects", "users", column: "creator_id", on_delete: :restrict
+  add_foreign_key "repository_configs", "projects", on_delete: :cascade
 end
