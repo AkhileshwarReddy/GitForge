@@ -1,6 +1,7 @@
 class User < ApplicationRecord
-    has_many :memberships, dependent: :destroy, inverse_of: 'User'
-    has_many :created_projects, class_name: 'Project',
+    has_many :memberships, dependent: :destroy, inverse_of: :user
+    has_many :organisations, through: :memberships
+    has_many :created_projects, class_name: "Project",
         foreign_key: :creator_id, dependent: :restrict_with_error,
         inverse_of: :creator
 
