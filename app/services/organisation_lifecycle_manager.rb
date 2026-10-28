@@ -1,11 +1,11 @@
-class OrganisationLifecycleManager 
+class OrganisationLifecycleManager
     def self.run_demo!(org_name)
         org = Organisation.create!(name: org_name, plan: :pro)
         org.update!(
             plan: :enterprise,
             verified: true,
             billing_email: "ops@#{org.slug}.com",
-            ip_allowlist: ["0.0.0.0"]
+            ip_allowlist: [ "0.0.0.0" ]
         )
 
         org_destroyed = begin

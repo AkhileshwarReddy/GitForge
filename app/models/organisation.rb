@@ -5,11 +5,11 @@ class Organisation < ApplicationRecord
     before_destroy :prevent_verified_enterprise_destruction, prepend: true
     around_save :measure_save_duration
     after_save AuditLoggerCallback.new
-    after_commit :publish_outbox_event, on: [:create, :update]
+    after_commit :publish_outbox_event, on: [ :create, :update ]
     after_rollback :mark_transaction_aborted
 
     attr_reader :last_save_duration_ms
-    
+
     cattr_accessor :published_events, default: []
     attr_accessor :transaction_aborted
 
