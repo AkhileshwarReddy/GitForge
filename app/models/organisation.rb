@@ -3,6 +3,10 @@ class Organisation < ApplicationRecord
     has_many :members, through: :memberships, source: :user
     has_many :projects, dependent: :destroy
     has_many :repository_configs, through: :projects
+    has_many :pinned_projects, -> { where(pinned: true, archived: false).order(stars_count: :desc) },
+        class_name: 'Project'
+    has_many :owners, -> { where(memberships: { access_level: :owner }) },
+        through: :memberships, source: :user
 
     before_validation :derive_slug_from_name, on: :create
     after_initialize :apply_default_settings, if: :new_record?
