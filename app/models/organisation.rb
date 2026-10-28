@@ -1,4 +1,5 @@
 class Organisation < ApplicationRecord
+    before_validation :derive_slug_from_name, on: :create
     after_initialize :apply_default_settings, if: :new_record?
 
     validates_with OrganisationPlanValidator
@@ -6,7 +7,7 @@ class Organisation < ApplicationRecord
     RESERVED_NAMES = %w[admin api root help explore settings login help oauth graphql].freeze
     FREE_EMAIL_DOMAINS = %w[gmail.com yahoo.com hotmail.com outlook.com].freeze
 
-    attribute :slug, :normalized_slig
+    attribute :slug, :normalized_slug
 
     enum :plan, { free: 0, pro: 1, enterprise: 2 },
         prefix: :plan, validate: true
@@ -66,5 +67,9 @@ class Organisation < ApplicationRecord
 
     def apply_default_settings
         self.settings = { default_branch: "main", require_2fa: false }.merge(settings || {})
+    end
+
+    def derive_slug_from_name
+        self.slug = name if slug.blank? && name.present?
     end
 end
