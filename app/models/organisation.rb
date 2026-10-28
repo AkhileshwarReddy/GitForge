@@ -1,6 +1,7 @@
 class Organisation < ApplicationRecord
     before_validation :derive_slug_from_name, on: :create
     after_initialize :apply_default_settings, if: :new_record?
+    before_create :set_default_pro_trial, if: :plan_pro?
 
     validates_with OrganisationPlanValidator
 
@@ -71,5 +72,9 @@ class Organisation < ApplicationRecord
 
     def derive_slug_from_name
         self.slug = name if slug.blank? && name.present?
+    end
+
+    def set_default_pro_trial
+        self.trial_ends_at ||= 14.days.from_now
     end
 end

@@ -2,6 +2,10 @@ class User < ApplicationRecord
     RESERVED_NAMES = %w[admin api root help explore settings login help oauth graphql].freeze
     THEMES = %w[light dark system].freeze
 
+    before_update :reset_failed_attempt_on_update, if: -> {
+        will_save_change_to_locked_at? & locked_at.nil?
+    }
+
     after_find { @hydrated_at = Process.clock_gettime(Process::CLOCK_MONOTONIC) }
     attr_reader :hydrated_at
     
@@ -29,5 +33,11 @@ class User < ApplicationRecord
         user = find_by!(email: email)
         user.update!(locked_at: Time.current, failed_attempts: user.failed_attempts + 1)
         user.reload
+    end
+
+    private
+
+    def reset_failed_attempt_on_update
+        self.failed_attempts = 0
     end
 end
