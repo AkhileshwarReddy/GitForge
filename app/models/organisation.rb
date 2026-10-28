@@ -1,4 +1,6 @@
 class Organisation < ApplicationRecord
+    attribute :slug, :normalized_slig
+    
     def plan_upgrade_summary
         return nil unless saved_change_to_plan?
         from_plan, to_plan = saved_change_to_plan
