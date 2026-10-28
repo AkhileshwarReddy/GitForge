@@ -5,8 +5,13 @@ class Organisation < ApplicationRecord
     before_destroy :prevent_verified_enterprise_destruction
     around_save :measure_save_duration
     after_save AuditLoggerCallback.new
+    after_commit :publish_outbox_event, on: [:create, :update]
+    after_rollback :mark_transaction_aborted
 
     attr_reader :last_save_duration_ms
+    
+    cattr_accessor :published_events, default: []
+    attr_accessor :transaction_aborted
 
     validates_with OrganisationPlanValidator
 
@@ -94,5 +99,13 @@ class Organisation < ApplicationRecord
         t0 = Process.clock_gettime(Process::CLOCK_MONOTONIC)
         yield
         @last_save_duration_ms = ((Process.clock_gettime(Process::CLOCK_MONOTONIC) - t0) * 1000.0).round(2)
+    end
+
+    def publish_outbox_event
+        self.class.published_events << { org_id: id, slug: slug, plan: plan }
+    end
+
+    def mark_transaction_aborted
+        @transaction_aborted = true
     end
 end
