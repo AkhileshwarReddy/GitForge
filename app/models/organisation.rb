@@ -30,6 +30,8 @@ class Organisation < ApplicationRecord
         validates :ip_allowlist, presence: { message: "must specify at least one CIDR block for Enterprise" }
     end
 
+    validates :ip_allowlist, cidr_array: true
+
     validate :require_corporate_billing_email, on: :billing_checkout
 
     def plan_upgrade_summary
