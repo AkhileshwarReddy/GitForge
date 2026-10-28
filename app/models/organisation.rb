@@ -8,8 +8,11 @@ class Organisation < ApplicationRecord
 
     validates :name, presence: true, length: { minimum: 2, maximum: 120 }
     validates :slug, presence: true, length: { in: 2..80 },
-        format: { with: /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/ },
-        message: "must be lowercase alphanumeric with hyphens"
+        uniqueness: { case_sensitive: false,
+            condition: -> ( where(deleted_at: nil) ),
+            message: "is already taken by active organisation" },
+        format: { with: /\A[a-z0-9]+(?:-[a-z0-9]+)*\z/,
+            message: "must be lowercase alphanumeric with hyphens" }
 
     def plan_upgrade_summary
         return nil unless saved_change_to_plan?

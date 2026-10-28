@@ -7,9 +7,11 @@ class User < ApplicationRecord
 
     store_accessor :preferences, :theme, :timezone, :compact_view, prefix: :pref
 
-    validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }
+    validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP },
+        uniqueness: { case_sensitive: false }
     validates :username, presence: true, length: { in: 3..60 },
-        format: { with: /\A[a-zA-Z0-9_.-]+\z/ }
+        format: { with: /\A[a-zA-Z0-9_.-]+\z/ },
+        uniqueness: { case_sensitive: false }
 
     def self.lock_account!(email)
         user = find_by!(email: email)
