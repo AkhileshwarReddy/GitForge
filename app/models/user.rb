@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+    after_save AuditLoggerCallback.new
+
     RESERVED_NAMES = %w[admin api root help explore settings login help oauth graphql].freeze
     THEMES = %w[light dark system].freeze
 

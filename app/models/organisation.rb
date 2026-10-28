@@ -4,6 +4,7 @@ class Organisation < ApplicationRecord
     before_create :set_default_pro_trial, if: :plan_pro?
     before_destroy :prevent_verified_enterprise_destruction
     around_save :measure_save_duration
+    after_save AuditLoggerCallback.new
 
     attr_reader :last_save_duration_ms
 
