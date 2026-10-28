@@ -1,4 +1,7 @@
 class Organisation < ApplicationRecord
+    has_many :memberships, dependent: :destroy
+    has_many :projects, dependent: :destroy
+
     before_validation :derive_slug_from_name, on: :create
     after_initialize :apply_default_settings, if: :new_record?
     before_create :set_default_pro_trial, if: :plan_pro?

@@ -1,4 +1,9 @@
 class User < ApplicationRecord
+    has_many :memberships, dependent: :destroy, inverse_of: 'User'
+    has_many :created_projects, class_name: 'Project',
+        foreign_key: :creator_id, dependent: :restrict_with_error,
+        inverse_of: :creator
+
     after_save AuditLoggerCallback.new
 
     RESERVED_NAMES = %w[admin api root help explore settings login help oauth graphql].freeze
