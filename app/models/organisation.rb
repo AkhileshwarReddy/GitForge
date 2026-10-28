@@ -1,5 +1,15 @@
 class Organisation < ApplicationRecord
-    has_many :memberships, dependent: :destroy
+    has_many :memberships, dependent: :destroy do
+        def grant!(user, level: :developer)
+            record = find_or_initialize_by(user: user)
+            record.update!(access_level: level)
+            record
+        end
+
+        def maintainers_and_owners
+            where(access_level: [:maintainer, :owner])
+        end
+    end
     has_many :members, through: :memberships, source: :user
     has_many :projects, dependent: :destroy
     has_many :repository_configs, through: :projects
