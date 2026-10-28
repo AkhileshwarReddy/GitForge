@@ -1,4 +1,6 @@
 class Organisation < ApplicationRecord
+    after_initialize :apply_default_settings, if: :new_record?
+
     validates_with OrganisationPlanValidator
 
     RESERVED_NAMES = %w[admin api root help explore settings login help oauth graphql].freeze
@@ -60,5 +62,9 @@ class Organisation < ApplicationRecord
         if domain.blank? || FREE_EMAIL_DOMAINS.include?(domain)
             errors.add(:billing_email, :corporate_domain_required, message: "must be a corporate domain for checkout")
         end
+    end
+
+    def apply_default_settings
+        self.settings = { default_branch: "main", require_2fa: false }.merge(settings || {})
     end
 end

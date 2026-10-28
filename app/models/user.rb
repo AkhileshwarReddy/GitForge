@@ -2,6 +2,9 @@ class User < ApplicationRecord
     RESERVED_NAMES = %w[admin api root help explore settings login help oauth graphql].freeze
     THEMES = %w[light dark system].freeze
 
+    after_find { @hydrated_at = Process.clock_gettime(Process::CLOCK_MONOTONIC) }
+    attr_reader :hydrated_at
+    
     normalizes :email, with: ->(email) { email.strip.downcase }
     normalizes :username, with: ->(u) { u.strip }
 
