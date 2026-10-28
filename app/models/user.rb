@@ -12,6 +12,7 @@ class User < ApplicationRecord
     validates :username, presence: true, length: { in: 3..60 },
         format: { with: /\A[a-zA-Z0-9_.-]+\z/ },
         uniqueness: { case_sensitive: false }
+    validates :failed_attempts, comparison: { greater_than_or_equal_to: 0 }
 
     def self.lock_account!(email)
         user = find_by!(email: email)
