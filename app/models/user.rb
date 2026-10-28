@@ -1,4 +1,7 @@
 class User < ApplicationRecord
+    RESERVED_NAMES = %w[admin api root help explore settings login help oauth graphql].freeze
+    THEMES = %w[light dark system].freeze
+
     normalizes :email, with: ->(email) { email.strip.downcase }
     normalizes :username, with: ->(u) { u.strip }
 
@@ -10,9 +13,12 @@ class User < ApplicationRecord
     validates :email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP },
         uniqueness: { case_sensitive: false }
     validates :username, presence: true, length: { in: 3..60 },
+        exclusion: { in: RESERVED_NAMES, message: "%{value} is reserved"},
         format: { with: /\A[a-zA-Z0-9_.-]+\z/ },
         uniqueness: { case_sensitive: false }
     validates :failed_attempts, comparison: { greater_than_or_equal_to: 0 }
+    validates :pref_theme, inclusion: { in: THEMES }, allow_nil: true
+    validates :terms_accepted, acceptance: true, on: :registration
 
     def self.lock_account!(email)
         user = find_by!(email: email)

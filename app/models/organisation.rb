@@ -1,4 +1,6 @@
 class Organisation < ApplicationRecord
+    RESERVED_NAMES = %w[admin api root help explore settings login help oauth graphql].freeze
+
     attribute :slug, :normalized_slig
 
     enum :plan, { free: 0, pro: 1, enterprise: 2 },
@@ -8,6 +10,7 @@ class Organisation < ApplicationRecord
 
     validates :name, presence: true, length: { minimum: 2, maximum: 120 }
     validates :slug, presence: true, length: { in: 2..80 },
+        exclusion: { in: RESERVED_NAMES, message: "%{value} is reserved" },
         uniqueness: { case_sensitive: false,
             conditions: -> { where(deleted_at: nil) },
             message: "is already taken by active organisation" },
