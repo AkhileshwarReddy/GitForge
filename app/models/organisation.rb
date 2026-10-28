@@ -2,6 +2,7 @@ class Organisation < ApplicationRecord
     before_validation :derive_slug_from_name, on: :create
     after_initialize :apply_default_settings, if: :new_record?
     before_create :set_default_pro_trial, if: :plan_pro?
+    before_destroy :prevent_verified_enterprise_destruction
 
     validates_with OrganisationPlanValidator
 
@@ -76,5 +77,12 @@ class Organisation < ApplicationRecord
 
     def set_default_pro_trial
         self.trial_ends_at ||= 14.days.from_now
+    end
+
+    def prevent_verified_enterprise_destruction
+        if plan_enterprise? && verified?
+            errors.add(:base, "cannot destroy a verified enterprise, archive it first")
+            throw(:abort)
+        end
     end
 end
