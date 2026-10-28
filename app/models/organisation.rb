@@ -1,6 +1,9 @@
 class Organisation < ApplicationRecord
     attribute :slug, :normalized_slig
 
+    enum :plan, { free: 0, pro: 1, enterprise: 2 }, 
+        prefix: :plan, validate: true
+
     store_accessor :settings, :default_branch
 
     def plan_upgrade_summary
